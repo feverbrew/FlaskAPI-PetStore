@@ -21,6 +21,9 @@ pets_args.add_argument("status", type=Status)
 img_arg = reqparse.RequestParser()
 img_arg.add_argument("photoUrl", type=str)
 
+status_arg = reqparse.RequestParser()
+status_arg.add_argument("statuses", type=Status, action = 'append')
+
 pets = {}
 
 def pet_id_dne(id):
@@ -60,14 +63,24 @@ class PetID(Resource):
 class PetIDImage(Resource):
     def post(self, id):
         pet_id_dne(id)
-        pets[id].photoUrls.append(img_arg.parse_args())
-        return 'Picture successfully uploaded!', 200
+        pets[id]['photoUrls'].append(img_arg.args[0]) # Pretty sure this is broken, check parser more thouroughly. Maybe need to use parse args? Or its possible there is something else wrong here.
+        #won't let me print the json response (probably because this isn't actually an image from the way I'm doing it)
+        return 'Picture successfully uploaded!'
+
+class StatusFilter(Resource):
+    def get(self):
+        filteredpets = {}
+        for pet in pets:
+            if pet['status'] in status_arg.args[0]: # Almost certainly broken as well lol
+                filteredpets[pet.id] = pet
+        return filteredpets
 
 
 
 api.add_resource(Pet, "/pet")
 api.add_resource(PetID, "/pet/<int:id>")
 api.add_resource(PetIDImage, "/pet/<int:id>/uploadImage")
+api.add_resource(StatusFilter, "/pet/findByStatus")
 
 
 if __name__ == "__main__":
