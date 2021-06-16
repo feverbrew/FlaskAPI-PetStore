@@ -43,8 +43,8 @@ img_arg.add_argument("photoUrl", type=str)
 status_arg = reqparse.RequestParser()
 status_arg.add_argument("statuses", type=Status, action = 'append')
 
-userlist_args = reqparse.RequestParser()
-userlist_args.add_argument("userlist", type=list)
+# userlist_args = reqparse.RequestParser()
+# userlist_args.add_argument("userlist", type=dict)
 
 order_args = reqparse.RequestParser()
 order_args.add_argument("id", type=int)
@@ -138,12 +138,13 @@ class User(Resource):
         users[username] = args
         return users[username]
 
-class UserList(Resource):
-    def post(self):
-        for i in userlist_args.parse_args():
-            username_exists(i.username)
-            users[i.username] = i
-        return ''
+# class UserList(Resource):
+#     def post(self):
+#         args = userlist_args.parse_args()
+#         for i in args:
+#             username_exists(args.i.username)
+#             users[args.i.username] = args.i
+#         return ''
 
 class UserActions(Resource):
     def get(self, username):
@@ -170,6 +171,7 @@ class UserLogin(Resource):
         username_dne(login.username)
         if users[login.username].password == login.password:
             loggedIn(login.username)
+            return login.username + " has been logged in", 200
         else:
             abort(401, "Invalid password!")
 
@@ -178,13 +180,14 @@ class UserLogout(Resource):
         for user in logged_in_users:
             users[user].status = 0
         logged_in_users.clear()
+        return "Sucessfully logged out", 200
 
 class StorePlaceOrder(Resource):
     def post(self):
         order = order_args.parse_args()
         order_exists(order.id)
         orders[order.id] = order
-        return order[order.id]
+        return orders[order.id]
 
 class StoreOrderActions(Resource):
     def get(self, id):
@@ -212,7 +215,7 @@ api.add_resource(PetIDImage, "/pet/<int:id>/uploadImage")
 api.add_resource(StatusFilter, "/pet/findByStatus")
 
 api.add_resource(User, "/user")
-api.add_resource(UserList, "/user/createWithList")
+#api.add_resource(UserList, "/user/createWithList")
 api.add_resource(UserActions, "/user/<string:username>")
 api.add_resource(UserLogin, "/user/login")
 api.add_resource(UserLogout, "/user/logout")
