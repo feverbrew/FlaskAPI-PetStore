@@ -1,4 +1,4 @@
-from flask import Flask, abort, request
+from flask import Flask, abort, request, jsonify
 from flask_restful import Api, Resource, reqparse
 from enum import Enum
 
@@ -63,17 +63,17 @@ class PetID(Resource):
 class PetIDImage(Resource):
     def post(self, id):
         pet_id_dne(id)
-        pets[id]['photoUrls'].append(img_arg.args[0]) # Pretty sure this is broken, check parser more thouroughly. Maybe need to use parse args? Or its possible there is something else wrong here.
+        pets[id].photoUrls.append(img_arg.parse_args().photoUrl) # Pretty sure this is broken, check parser more thouroughly. Maybe need to use parse args? Or its possible there is something else wrong here.
         #won't let me print the json response (probably because this isn't actually an image from the way I'm doing it)
         return 'Picture successfully uploaded!'
 
 class StatusFilter(Resource):
     def get(self):
         filteredpets = {}
-        for pet in pets:
-            if pet['status'] in status_arg.args[0]: # Almost certainly broken as well lol
-                filteredpets[pet.id] = pet
-        return filteredpets
+        for id in pets:
+            if pets[id].status in status_arg.parse_args().statuses: # Almost certainly broken as well lol
+                filteredpets[id] = pets[id]
+        return jsonify(filteredpets)
 
 
 

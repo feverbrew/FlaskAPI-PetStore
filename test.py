@@ -14,5 +14,5 @@ response = requests.post(BASE + "pet/1/uploadImage", {"photoUrl":"url.url.pog"})
 response = requests.get(BASE + "pet/1")
 print(response.json())
 
-response = requests.get(BASE + "pet/findByStatus", {"status":"SOLD"})
-print(response)
+response = requests.get(BASE + "pet/findByStatus", {"statuses":"SOLD"})
+print(response.json())
